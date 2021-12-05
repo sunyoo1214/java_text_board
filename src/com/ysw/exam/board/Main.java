@@ -18,7 +18,7 @@ public class Main {
     int articlesLastId = 0;
     List<Article> articles = new ArrayList<>();
 
-        makeTestData(articles);
+    makeTestData(articles);
 
     if (articles.size() > 0) {
       articlesLastId = articles.get(articles.size() - 1).id;
@@ -39,40 +39,50 @@ public class Main {
         System.out.println("번호 / 제목");
         System.out.println("--------------------");
 
-        for (int i = articles.size() - 1; i >= 0; i--) {
-          Article article = articles.get(i);
-          System.out.printf("%d / %s\n", article.id, article.title);
+        boolean orderByIdDesc = true;
+
+        if (params.containsKey("orderBy") && params.get("orderBy").equals("idAsc")) {
+          orderByIdDesc = false;
+        }
+
+        if (orderByIdDesc) {
+          for (int i = articles.size() - 1; i >= 0; i--) {
+            Article article = articles.get(i);
+            System.out.printf("%d / %s\n", article.id, article.title);
+          }
+        } else {
+          for (Article article : articles) {
+            System.out.printf("%d / %s\n", article.id, article.title);
+          }
         }
 
       } else if (rq.getUrlPath().equals("/usr/article/detail")) {
-
-        if(params.containsKey("id") == false){
+        if (params.containsKey("id") == false) {
           System.out.println("id를 입력해주세요.");
-        continue;
+          continue;
         }
 
         int id = 0;
 
         try {
           id = Integer.parseInt(params.get("id"));
-        } catch (NumberFormatException eg) {
-          System.out.println("id를 정수 형태로 입력해주세요.");
+        } catch (NumberFormatException e) {
+          System.out.println("id를 정수형태로 입력해주세요.");
           continue;
         }
-
 
         if (id > articles.size()) {
           System.out.println("게시물이 존재하지 않습니다.");
           continue;
         }
 
-        Article article = articles.get(id- 1);
+        Article article = articles.get(id - 1);
 
         System.out.println("- 게시물 상세내용 -");
         System.out.printf("번호 : %d\n", article.id);
         System.out.printf("제목 : %s\n", article.title);
         System.out.printf("내용 : %s\n", article.body);
-      } else if (cmd.equals("/usr/article/write")) {
+      } else if (rq.getUrlPath().equals("/usr/article/write")) {
         System.out.println("- 게시물 등록 -");
         System.out.printf("제목 : ");
         String title = sc.nextLine();
@@ -113,6 +123,7 @@ class Article {
     return String.format("{id: %d, title: \"%s\", body: \"%s\"}", id, title, body);
   }
 }
+
 class Rq {
   private String url;
   private String urlPath;
